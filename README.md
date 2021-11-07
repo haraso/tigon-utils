@@ -8,7 +8,7 @@
     ```
     npm install @tigon/state-manager
     ```
-2. Install [Tigon React Hooks](https://www.npmjs.com/package/@tigon/utils)
+2. Install [Tigon Utils](https://www.npmjs.com/package/@tigon/utils)
     ```
     npm install @tigon/utils
     ```
