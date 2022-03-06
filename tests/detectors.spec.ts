@@ -15,21 +15,25 @@ describe("detectors functions tests", () => {
   });
 
   test('array', () => {
-    const res = testFn(["a", "b", "c"], array());
+    const originalArray = ["a", "b", "c"];
+    const res = testFn(originalArray, array());
 
     expect(res).toEqual(["a", "b", "c"]);
+    expect(res).not.toBe(originalArray);
   });
 
   test('array with index', () => {
+    const originalArray = ["a", "b", "c"];
     const res = testFn(["a", "b", "c"], array(0, 2));
 
     expect(res).toEqual(["a", "c"]);
+    expect(res).not.toBe(originalArray);
   });
 
   test('object', () => {
     const res = testFn({ a: 1, b: 2, c: 3 }, object());
 
-    expect(res).toEqual([1, 2, 3]);
+    expect(res).toEqual(["a", 1, "b", 2, "c", 3]);
   });
 
   test('object with props', () => {

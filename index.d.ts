@@ -15,3 +15,6 @@ import("./maps/boolToValue");
 import("./detectors/atomic");
 import("./detectors/array");
 import("./detectors/object");
+
+//creators
+import("./creators/createChildStore");

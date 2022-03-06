@@ -4,16 +4,17 @@
 
 ---
 
-1. Install [Tigon State Manager](https://www.npmjs.com/package/@tigon/state-manager) 
-    ```
-    npm install @tigon/state-manager
-    ```
+1. Install [Tigon State Manager](https://www.npmjs.com/package/@tigon/state-manager)
+   ```
+   npm install @tigon/state-manager
+   ```
 2. Install [Tigon Utils](https://www.npmjs.com/package/@tigon/utils)
-    ```
-    npm install @tigon/utils
-    ```
+   ```
+   npm install @tigon/utils
+   ```
 
 ---
+
 ---
 
 ## How to use maps
@@ -28,15 +29,15 @@ import valueToValue from "@tigon/utils/maps/valueToValue";
 const userNameStore = Store<string>("Mr. Developer");
 
 const copyOfUserNameStore = Store<string>("")
+  .from(userNameStore)
+  // .map((value) => value)
+  .map(valueToValue())
 
-.from(userNameStore)
-// .map((value) => value)
-.map(valueToValue())
-
-.to(userNameStore)
-// .map((value) => value)
-.map(valueToValue())
+  .to(userNameStore)
+  // .map((value) => value)
+  .map(valueToValue());
 ```
+
 ---
 
 ### propToProp:
@@ -44,26 +45,31 @@ const copyOfUserNameStore = Store<string>("")
 ```ts
 import propToProp from "@tigon/utils/maps/propToProp";
 
-const userDetailsStore = Store<{userName: string, email: string}>({userName: "user", email: "user@email.com"});
+const userDetailsStore = Store<{ userName: string; email: string }>({
+  userName: "user",
+  email: "user@email.com",
+});
 
-const snakeCaseUserDetailsStore = Store<{user_name: string, email: string}>({})
+const snakeCaseUserDetailsStore = Store<{ user_name: string; email: string }>(
+  {}
+)
+  .from(userDetailsStore)
+  // .map((camelCase, snakeCase) => {
+  //   snakeCase.user_name = camelCase.userName;
+  //   snakeCase.email = camelCase.email;
+  //   return snakeCase;
+  // })
+  .map(propToProp({ userName: "user_name", email: "email" }))
 
-.from(userDetailsStore)
-// .map((camelCase, snakeCase) => {
-//   snakeCase.user_name = camelCase.userName;
-//   snakeCase.email = camelCase.email;
-//   return snakeCase;
-// })
-.map(propToProp({userName: 'user_name', email: 'email'}))
-
-.to(userDetailsStore)
-// .map((snakeCase, camelCase) => {
-//   camelCase.userName = snakeCase.user_name;
-//   camelCase.email = snakeCase.email;
-//   return camelCase;
-// })
-.map(propToProp({user_name: 'userName', email: 'email'}))
+  .to(userDetailsStore)
+  // .map((snakeCase, camelCase) => {
+  //   camelCase.userName = snakeCase.user_name;
+  //   camelCase.email = snakeCase.email;
+  //   return camelCase;
+  // })
+  .map(propToProp({ user_name: "userName", email: "email" }));
 ```
+
 ---
 
 ### propToValue & valueToProp:
@@ -73,71 +79,80 @@ import propToValue from "@tigon/utils/maps/propToValue";
 import valueToProp from "@tigon/utils/maps/valueToProp";
 
 type UserDetails = {
-    userName: string
-    email: string
-}
+  userName: string;
+  email: string;
+};
 
 const rootStore = Store<{
-    userDetails: UserDetails
+  userDetails: UserDetails;
 }>({
-    userDetails: {
-        userName: "user",
-        email: "user@email.com"
-    }
+  userDetails: {
+    userName: "user",
+    email: "user@email.com",
+  },
 });
 
 const userDetailsStore = Store<UserDetails>({})
+  .from(rootStore)
+  // .map((root) => root.userDetails)
+  .map(propToValue("userDetails"))
 
-.from(rootStore)
-// .map((root) => root.userDetails)
-.map(propToValue("userDetails"))
-
-.to(rootStore)
-// .map((userDetails, root) => {
-//   root.userDetails = userDetails;
-//   return root;
-// })
-.map(valueToProp("userDetails"))
+  .to(rootStore)
+  // .map((userDetails, root) => {
+  //   root.userDetails = userDetails;
+  //   return root;
+  // })
+  .map(valueToProp("userDetails"));
 ```
+
 ---
 
 ### boolToValue:
 
 `boolToValue(options)` can map boolean to value.
+
 - Arg: `option` is like this
-    - `{true: value, false: value}` or `{true: value}` or `{false: value}`
-    - It means if the base state is true the target state value will be set value as defined on property true.
-    - If the base state is true, and true property is not defined, or vice versa, the target state will not change. 
+  - `{true: value, false: value}` or `{true: value}` or `{false: value}`
+  - It means if the base state is true the target state value will be set value as defined on property true.
+  - If the base state is true, and true property is not defined, or vice versa, the target state will not change.
+
 ---
 
 ### valueToBool:
 
 `valueToBool(options)` can map value to boolean.
+
 - Arg: `option` is like this
-    - `{eq: value}` or `{neq: value}`
-    - `eq` means if the base state is equal to the value as defined on the eq property, the target state will be `true`.
-    - `neq` means if the base state is equal to the value as defined on the eq property, the target state will be `false`.
+  - `{eq: value}` or `{neq: value}`
+  - `eq` means if the base state is equal to the value as defined on the eq property, the target state will be `true`.
+  - `neq` means if the base state is equal to the value as defined on the eq property, the target state will be `false`.
+
 ---
 
 ### boolToProp:
 
 `boolToProp(key, options)` can map boolean to target state property.
+
 - Arg: `key` is the name of target state properties.
 - Arg: `option` is like this
-    - `{true: value, false: value}` or `{true: value}` or `{false: value}`
-    - It means if the base state is true the target state property value will be set value as defined on property true.
-    - If the base state is true, and true property is not defined, or vice versa, the target state property will not change.
+  - `{true: value, false: value}` or `{true: value}` or `{false: value}`
+  - It means if the base state is true the target state property value will be set value as defined on property true.
+  - If the base state is true, and true property is not defined, or vice versa, the target state property will not change.
+
 ---
 
 ### propToBool:
 
 `propToBool(key, options)` can map base state property to boolean.
+
 - Arg: `key` is the name of base state properties.
 - Arg: `option` is like this
-    - `{eq: value}` or `{neq: value}`
-    - `eq` means if the base state property is equal to the value as defined on the eq property, the target state will be `true`.
-    - `neq` means if the base state property is equal to the value as defined on the eq property, the target state will be `false`.
+  - `{eq: value}` or `{neq: value}`
+  - `eq` means if the base state property is equal to the value as defined on the eq property, the target state will be `true`.
+  - `neq` means if the base state property is equal to the value as defined on the eq property, the target state will be `false`.
+
 ---
+
 ---
 
 ## How to use detectors
@@ -147,9 +162,11 @@ const userDetailsStore = Store<UserDetails>({})
 ### atomic:
 
 `atomic()` This detector will check the full store.
-  - Recommended for atomic type based stores. ex.: `string` or `number`
+
+- Recommended for atomic type based stores. ex.: `string` or `number`
 
 Example:
+
 ```ts
 import atomic from "@tigon/utils/detectors/atomic";
 
@@ -160,11 +177,13 @@ const userNameStore = Store<string>("user", atomic());
 
 ### array:
 
-`array(...idxs)` This detector will check the values of the store. 
-  - Args: `...idx optional` Every argument is an index of store items. If it is called without index, it will be checking every item.
-  - Recommended for `array` type based stores.
+`array(...idxs)` This detector will check the values of the store.
+
+- Args: `...idx optional` Every argument is an index of store items. If it is called without index, it will be checking every item.
+- Recommended for `array` type based stores.
 
 Example:
+
 ```ts
 import array from "@tigon/utils/detectors/array";
 
@@ -175,23 +194,86 @@ const namesStore = Store<string[]>(["user"], array());
 
 ### object:
 
-`object(...props)` This detector will check the properties of the store object. 
-  - Args: `...props optional` Every argument is one of the property names of the store object. If it is called without arguments, it will be checking every property on the store object.
-  - Recommended for `flat object` type based stores.
+`object(...props)` This detector will check the properties of the store object.
+
+- Args: `...props optional` Every argument is one of the property names of the store object. If it is called without arguments, it will be checking every property on the store object.
+- Recommended for `flat object` type based stores.
 
 Example:
+
 ```ts
 import object from "@tigon/utils/detectors/object";
 
 type UserDetails = {
-    userName: string
-    email: string
-}
+  userName: string;
+  email: string;
+};
 
-const userDetailsStore = Store<UserDetails>({
+const userDetailsStore = Store<UserDetails>(
+  {
     userName: "user",
-    email: "user@email.com"
-}, object());
+    email: "user@email.com",
+  },
+  object()
+);
+```
+
+---
+
+---
+
+## How to use creators
+
+---
+
+### createChildStore:
+
+`createChildStore(parentStore, key, options?)` This function create a new store from an other.
+
+- `parentStore`: Parent Store
+- `key`: property or index from the parent state
+- `options`: `{ sync: "from" | "to" | "from-to" }` by default is `{ sync: "from-to" }`
+  - `sync="from"`: If the parent's state has been changed the child's state change as well.
+  - `sync="to"`: If the child's state has been changed the parent's state change as well.
+  - `sync="from-to"`: If the parent's or child's state has been changed both states change.
+
+Example:
+
+```ts
+import createChildStore from "@tigon/utils/creators/createChildStore";
+
+type UserDetails = {
+  userName: string;
+  email: string;
+};
+
+type ThemeConfig = {
+  darkMode: boolean;
+};
+
+const rootStore = Store<{
+  userDetails: UserDetails;
+  themeConfig: ThemeConfig;
+}>({
+  userDetails: {
+    userName: "user",
+    email: "user@email.com",
+  },
+  themeConfig: {
+    darkMode: false,
+  },
+});
+
+...
+
+const userDetailsStore = createChildStore(rootStore, "userDetails");
+const userNamesStore = createChildStore(userDetailsStore, "userName");
+const userEmailStore = createChildStore(userDetailsStore, "email");
+
+...
+
+const themeConfigStore = createChildStore(rootStore, "themeConfig");
+const darkModeStore = createChildStore(themeConfigStore, "darkMode");
 ```
 
 ---
